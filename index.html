@@ -66,23 +66,23 @@ layout: default
   <h2>By The Numbers</h2>
   <div class="stats-grid">
     <div class="stat-block">
-      <span class="stat-number">5.56T</span>
+      <span class="stat-number">{{ site.data.stats.isk_destroyed }}</span>
       <span class="stat-label">ISK Destroyed (alltime)</span>
     </div>
     <div class="stat-block">
-      <span class="stat-number">93.5%</span>
-      <span class="stat-label">Efficiency (recent)</span>
+      <span class="stat-number">{{ site.data.stats.efficiency }}%</span>
+      <span class="stat-label">Efficiency (alltime)</span>
     </div>
     <div class="stat-block">
-      <span class="stat-number">77</span>
-      <span class="stat-label">Active pilots (7 days)</span>
+      <span class="stat-number">{{ site.data.stats.active_pilots_7d }}</span>
+      <span class="stat-label">Active Pilots (7 days)</span>
     </div>
     <div class="stat-block">
-      <span class="stat-number">428</span>
+      <span class="stat-number">{{ site.data.stats.members }}</span>
       <span class="stat-label">Members</span>
     </div>
   </div>
-  <p class="stats-source"><a href="https://zkillboard.com/corporation/98755828/" target="_blank">Live stats on zKillboard</a></p>
+  <p class="stats-source">Updated every 6 hours · <a href="https://zkillboard.com/corporation/98755828/" target="_blank">Full stats on zKillboard</a></p>
 </div>
 
 <hr class="section-divider" />

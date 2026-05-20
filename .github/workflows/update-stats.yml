@@ -1,0 +1,76 @@
+name: Update zKillboard Stats
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours
+  workflow_dispatch:          # allow manual trigger
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch zKillboard stats
+        run: |
+          curl -fsSL \
+            -H "Accept: application/json" \
+            -H "User-Agent: ohzie.github.io recruitment site" \
+            "https://zkillboard.com/api/stats/corporationID/98755828/" \
+            -o /tmp/zkill_raw.json
+
+      - name: Extract and write stats
+        run: |
+          python3 - <<'EOF'
+          import json, math
+
+          with open("/tmp/zkill_raw.json") as f:
+              d = json.load(f)
+
+          isk_destroyed = d.get("iskDestroyed", 0)
+          isk_lost      = d.get("iskLost", 0)
+          ships_destroyed = d.get("shipsDestroyed", 0)
+          ships_lost      = d.get("shipsLost", 0)
+          members         = d.get("info", {}).get("memberCount", 0)
+          active_pilots   = d.get("activepvp", {}).get("characters", {}).get("count", 0)
+
+          total_isk = isk_destroyed + isk_lost
+          efficiency = round(isk_destroyed / total_isk * 100, 1) if total_isk > 0 else 0.0
+
+          def fmt_isk(isk):
+              if isk >= 1_000_000_000_000:
+                  return f"{isk / 1_000_000_000_000:.2f}T"
+              elif isk >= 1_000_000_000:
+                  return f"{isk / 1_000_000_000:.1f}B"
+              else:
+                  return f"{isk / 1_000_000:.0f}M"
+
+          stats = {
+              "isk_destroyed":      fmt_isk(isk_destroyed),
+              "isk_destroyed_raw":  isk_destroyed,
+              "efficiency":         efficiency,
+              "ships_destroyed":    ships_destroyed,
+              "ships_lost":         ships_lost,
+              "members":            members,
+              "active_pilots_7d":   active_pilots,
+          }
+
+          with open("_data/stats.json", "w") as f:
+              json.dump(stats, f, indent=2)
+          print(json.dumps(stats, indent=2))
+          EOF
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add _data/stats.json
+          if git diff --cached --quiet; then
+            echo "No changes to stats."
+          else
+            git commit -m "chore: update zKillboard stats"
+            git push
+          fi
