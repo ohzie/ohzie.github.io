@@ -1,9 +1,9 @@
 {
-  "isk_destroyed": "6.63T",
-  "isk_destroyed_raw": 6625906071410,
+  "isk_destroyed": "6.64T",
+  "isk_destroyed_raw": 6637681959723,
   "efficiency": 93.0,
-  "ships_destroyed": 11314,
+  "ships_destroyed": 11336,
   "ships_lost": 3406,
   "members": 416,
-  "active_pilots_7d": 31
+  "active_pilots_7d": 29
 }
